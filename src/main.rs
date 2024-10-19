@@ -40,12 +40,12 @@ fn get_files_recursively<P: AsRef<Path>>(dir_path: P) -> Result<Vec<PathBuf>, Er
 
 fn main() -> Result<(), Error> {
     let args = Args::parse();
-    let input_dir_path = Path::new(&args.input_dir);
+    let input_dir_path = fs::canonicalize(args.input_dir)?;
 
-    let output_dir_path = get_output_dir_path(input_dir_path);
+    let output_dir_path = get_output_dir_path(&input_dir_path);
     println!("{:?}", output_dir_path);
 
-    let file_paths = get_files_recursively(input_dir_path)?;
+    let file_paths = get_files_recursively(&input_dir_path)?;
     println!("{:#?}", file_paths);
 
     Ok(())
