@@ -1,6 +1,7 @@
 use std::{
+    error,
     fs::{self},
-    io::Error,
+    io,
     path::{Path, PathBuf},
 };
 
@@ -20,7 +21,7 @@ fn get_output_dir_path(input_dir_path: &Path) -> PathBuf {
     output_dir_path
 }
 
-fn get_files_recursively<P: AsRef<Path>>(dir_path: P) -> Result<Vec<PathBuf>, Error> {
+fn get_files_recursively<P: AsRef<Path>>(dir_path: P) -> Result<Vec<PathBuf>, io::Error> {
     let mut paths: Vec<PathBuf> = Vec::new();
 
     let entries = fs::read_dir(dir_path)?;
@@ -38,15 +39,34 @@ fn get_files_recursively<P: AsRef<Path>>(dir_path: P) -> Result<Vec<PathBuf>, Er
     Ok(paths)
 }
 
-fn main() -> Result<(), Error> {
+fn compress_file(
+    input_file_path: &Path,
+    input_dir_path: &Path,
+    output_dir_path: &Path,
+) -> Result<(), Box<dyn error::Error>> {
+    // duplicate directory
+    if let Some(input_file_parent) = input_file_path.parent() {
+        let output_file_path =
+            output_dir_path.join(input_file_parent.strip_prefix(input_dir_path)?);
+        fs::create_dir_all(&output_file_path)?;
+    }
+
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn error::Error>> {
     let args = Args::parse();
     let input_dir_path = fs::canonicalize(args.input_dir)?;
 
     let output_dir_path = get_output_dir_path(&input_dir_path);
     println!("{:?}", output_dir_path);
 
-    let file_paths = get_files_recursively(&input_dir_path)?;
-    println!("{:#?}", file_paths);
+    let input_file_paths = get_files_recursively(&input_dir_path)?;
+    println!("{:#?}", input_file_paths);
+
+    for input_file_path in input_file_paths {
+        compress_file(&input_file_path, &input_dir_path, &output_dir_path)?;
+    }
 
     Ok(())
 }
