@@ -3,6 +3,7 @@ use std::{
     fs::{self},
     io,
     path::{Path, PathBuf},
+    process::Command,
 };
 
 use clap::Parser;
@@ -66,7 +67,24 @@ fn compress_file(
     }
 
     if is_video(input_file_path) {
-        // TODO: ffmpeg
+        Command::new("ffmpeg")
+            .args([
+                "-ss",
+                "0.3",
+                "-i",
+                input_file_path.to_str().unwrap_or_default(),
+                "-nostdin",
+                "-vcodec",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                "-r",
+                "60",
+                output_file_path.to_str().unwrap_or_default(),
+            ])
+            .spawn()?
+            .wait()?;
+
         println!(
             "compressed {:?} to {:?}.",
             input_file_path, output_file_path
@@ -83,11 +101,8 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     let args = Args::parse();
     let input_dir_path = fs::canonicalize(args.input_dir)?;
 
-    let output_dir_path = get_output_dir_path(&input_dir_path);
-    println!("{:?}", output_dir_path);
-
     let input_file_paths = get_files_recursively(&input_dir_path)?;
-    println!("{:#?}", input_file_paths);
+    let output_dir_path = get_output_dir_path(&input_dir_path);
 
     for input_file_path in input_file_paths {
         compress_file(&input_file_path, &input_dir_path, &output_dir_path)?;
