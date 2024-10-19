@@ -44,11 +44,17 @@ fn compress_file(
     input_dir_path: &Path,
     output_dir_path: &Path,
 ) -> Result<(), Box<dyn error::Error>> {
-    // duplicate directory
-    if let Some(input_file_parent) = input_file_path.parent() {
-        let output_file_path =
-            output_dir_path.join(input_file_parent.strip_prefix(input_dir_path)?);
-        fs::create_dir_all(&output_file_path)?;
+    if input_file_path.ends_with(".DS_Store") {
+        return Ok(());
+    };
+
+    let output_file_path = output_dir_path.join(input_file_path.strip_prefix(input_dir_path)?);
+    if output_file_path.exists() {
+        return Ok(());
+    }
+
+    if let Some(output_file_parent) = output_file_path.parent() {
+        fs::create_dir_all(&output_file_parent)?;
     }
 
     Ok(())
