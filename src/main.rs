@@ -17,8 +17,8 @@ struct Args {
 }
 
 fn get_output_dir_path(input_dir_path: &Path) -> PathBuf {
-    let input_file_name = input_dir_path.file_name().unwrap_or_default();
-    let output_dir_name = input_file_name.to_string_lossy().into_owned() + "_compressed";
+    let input_dir_name = input_dir_path.file_name().unwrap_or_default();
+    let output_dir_name = input_dir_name.to_string_lossy().into_owned() + "_dest";
     let output_dir_path = input_dir_path.with_file_name(output_dir_name);
     output_dir_path
 }
