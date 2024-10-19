@@ -6,6 +6,7 @@ use std::{
 };
 
 use clap::Parser;
+use mime_guess::{self, mime};
 
 /// compress videos in a directory
 #[derive(Parser)]
@@ -39,6 +40,13 @@ fn get_files_recursively<P: AsRef<Path>>(dir_path: P) -> Result<Vec<PathBuf>, io
     Ok(paths)
 }
 
+fn is_video(input_file_path: &Path) -> bool {
+    let guess = mime_guess::from_path(input_file_path);
+    guess
+        .first()
+        .is_some_and(|guessed| guessed.type_() == mime::VIDEO)
+}
+
 fn compress_file(
     input_file_path: &Path,
     input_dir_path: &Path,
@@ -55,6 +63,17 @@ fn compress_file(
 
     if let Some(output_file_parent) = output_file_path.parent() {
         fs::create_dir_all(&output_file_parent)?;
+    }
+
+    if is_video(input_file_path) {
+        // TODO: ffmpeg
+        println!(
+            "compressed {:?} to {:?}.",
+            input_file_path, output_file_path
+        );
+    } else {
+        fs::copy(input_file_path, &output_file_path)?;
+        println!("copied {:?} to {:?}.", input_file_path, output_file_path);
     }
 
     Ok(())
