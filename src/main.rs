@@ -13,6 +13,13 @@ struct Args {
     input_dir: String,
 }
 
+fn get_output_dir_path(input_dir_path: &Path) -> PathBuf {
+    let input_file_name = input_dir_path.file_name().unwrap_or_default();
+    let output_dir_name = input_file_name.to_string_lossy().into_owned() + "_compressed";
+    let output_dir_path = input_dir_path.with_file_name(output_dir_name);
+    output_dir_path
+}
+
 fn get_files_recursively<P: AsRef<Path>>(dir_path: P) -> Result<Vec<PathBuf>, Error> {
     let mut paths: Vec<PathBuf> = Vec::new();
 
@@ -31,12 +38,15 @@ fn get_files_recursively<P: AsRef<Path>>(dir_path: P) -> Result<Vec<PathBuf>, Er
     Ok(paths)
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     let args = Args::parse();
+    let input_dir_path = Path::new(&args.input_dir);
 
-    let output_dir = format!("{}_compressed", &args.input_dir);
-    println!("{}", output_dir);
+    let output_dir_path = get_output_dir_path(input_dir_path);
+    println!("{:?}", output_dir_path);
 
-    let file_paths = get_files_recursively(args.input_dir);
+    let file_paths = get_files_recursively(input_dir_path)?;
     println!("{:#?}", file_paths);
+
+    Ok(())
 }
