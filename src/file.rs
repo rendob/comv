@@ -7,6 +7,7 @@ use std::{
 use mime_guess::{self, mime};
 
 const OUTPUT_DIR_SUFFIX: &str = "_dest";
+const EXCLUDE_FILENAMES: [&str; 1] = [".DS_Store"];
 
 pub fn is_video(input_file_path: &Path) -> bool {
     let guess = mime_guess::from_path(input_file_path);
@@ -29,12 +30,21 @@ pub fn get_output_dir_path(input_dir_path: &Path, is_in_input_dir: bool) -> Path
 pub fn get_files<P: AsRef<Path>>(dir_path: P, is_recursive: bool) -> io::Result<HashSet<PathBuf>> {
     let mut paths: HashSet<PathBuf> = HashSet::new();
 
+    fn should_exclude(file_path: &Path) -> bool {
+        EXCLUDE_FILENAMES
+            .iter()
+            .any(|filename| file_path.ends_with(filename))
+    }
+
     let entries = fs::read_dir(dir_path)?;
     for entry in entries {
         let entry = entry?;
         let file_type = entry.file_type()?;
         if file_type.is_file() {
-            paths.insert(entry.path());
+            let file_path = entry.path();
+            if !should_exclude(&file_path) {
+                paths.insert(file_path);
+            }
         } else if file_type.is_dir() && is_recursive {
             let children = get_files(entry.path(), is_recursive)?;
             paths.extend(children);
@@ -96,8 +106,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case::recursive(true, vec![".DS_Store", "foo.mp4", "dir/xxx.png"])]
-    #[case(false, vec![".DS_Store", "foo.mp4"])]
+    #[case::recursive(true, vec!["foo.mp4", "dir/xxx.png"])]
+    #[case(false, vec!["foo.mp4"])]
     fn test_get_files(#[case] is_recursive: bool, #[case] expected: Vec<&str>) {
         let tmp_dir = TmpDir {
             path: PathBuf::from(format!(".tmp_{is_recursive}")),

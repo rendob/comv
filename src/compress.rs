@@ -7,10 +7,6 @@ pub fn compress_file(
     input_dir_path: &Path,
     output_dir_path: &Path,
 ) -> Result<(), Box<dyn Error>> {
-    if input_file_path.ends_with(".DS_Store") {
-        return Ok(());
-    };
-
     let output_file_path = output_dir_path.join(input_file_path.strip_prefix(input_dir_path)?);
     if output_file_path.exists() {
         return Ok(());
