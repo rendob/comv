@@ -5,13 +5,15 @@ use std::{
 
 use mime_guess::{self, mime};
 
+const OUTPUT_DIR_SUFFIX: &str = "_dest";
+
 pub fn get_output_dir_path(input_dir_path: &Path, is_in_input_dir: bool) -> PathBuf {
     if is_in_input_dir {
-        return input_dir_path.join("dest");
+        return input_dir_path.join(OUTPUT_DIR_SUFFIX);
     }
 
     let input_dir_name = input_dir_path.file_name().unwrap_or_default();
-    let output_dir_name = input_dir_name.to_string_lossy().into_owned() + "_dest";
+    let output_dir_name = input_dir_name.to_string_lossy().into_owned() + OUTPUT_DIR_SUFFIX;
     let output_dir_path = input_dir_path.with_file_name(output_dir_name);
     output_dir_path
 }
