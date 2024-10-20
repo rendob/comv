@@ -1,4 +1,4 @@
-# compress-video
+# comv
 
 動画圧縮用コマンド
 
@@ -23,5 +23,5 @@
    ```
 1. プロジェクトをビルドし、作成したバイナリを`~/command`配下に置く。
    ```sh
-   cargo build --release && cp ./target/release/compress-video ~/command
+   cargo build --release && cp ./target/release/comv ~/command
    ```
