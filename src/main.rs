@@ -6,15 +6,9 @@ use std::{
     process::Command,
 };
 
-use clap::Parser;
 use mime_guess::{self, mime};
 
-/// compress videos in a directory
-#[derive(Parser)]
-struct Args {
-    /// path of the directory that contains uncompressed videos
-    input_dir: String,
-}
+mod args;
 
 fn get_output_dir_path(input_dir_path: &Path) -> PathBuf {
     let input_dir_name = input_dir_path.file_name().unwrap_or_default();
@@ -98,7 +92,7 @@ fn compress_file(
 }
 
 fn main() -> Result<(), Box<dyn error::Error>> {
-    let args = Args::parse();
+    let args = args::parse_args();
     let input_dir_path = fs::canonicalize(args.input_dir)?;
 
     let input_file_paths = get_files_recursively(&input_dir_path)?;
