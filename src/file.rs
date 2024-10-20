@@ -66,4 +66,21 @@ mod tests {
 
         assert_eq!(result, expected);
     }
+
+    #[rstest]
+    #[case("/foo/bar", false, "/foo/bar_dest")]
+    #[case("/foo/bar", true, "/foo/bar/_dest")]
+    #[case("/aaa/bbb/ccc/", false, "/aaa/bbb/ccc_dest")]
+    #[case("/aaa/bbb/ccc/", true, "/aaa/bbb/ccc/_dest")]
+    fn test_get_output_dir_path(
+        #[case] input_dir_path: &str,
+        #[case] is_input_dir: bool,
+        #[case] expected: &str,
+    ) {
+        let input_dir_path = Path::new(input_dir_path);
+        let result = get_output_dir_path(input_dir_path, is_input_dir);
+
+        let expected = PathBuf::from(expected);
+        assert_eq!(result, expected);
+    }
 }
