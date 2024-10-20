@@ -7,6 +7,13 @@ use mime_guess::{self, mime};
 
 const OUTPUT_DIR_SUFFIX: &str = "_dest";
 
+pub fn is_video(input_file_path: &Path) -> bool {
+    let guess = mime_guess::from_path(input_file_path);
+    guess
+        .first()
+        .is_some_and(|guessed| guessed.type_() == mime::VIDEO)
+}
+
 pub fn get_output_dir_path(input_dir_path: &Path, is_in_input_dir: bool) -> PathBuf {
     if is_in_input_dir {
         return input_dir_path.join(OUTPUT_DIR_SUFFIX);
@@ -36,9 +43,16 @@ pub fn get_files<P: AsRef<Path>>(dir_path: P, is_recursive: bool) -> io::Result<
     Ok(paths)
 }
 
-pub fn is_video(input_file_path: &Path) -> bool {
-    let guess = mime_guess::from_path(input_file_path);
-    guess
-        .first()
-        .is_some_and(|guessed| guessed.type_() == mime::VIDEO)
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_video() {
+        let sut = Path::new("foo.txt");
+
+        let result = is_video(sut);
+
+        assert!(!result);
+    }
 }
