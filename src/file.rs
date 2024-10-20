@@ -46,13 +46,24 @@ pub fn get_files<P: AsRef<Path>>(dir_path: P, is_recursive: bool) -> io::Result<
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rstest::*;
 
-    #[test]
-    fn test_is_video() {
-        let sut = Path::new("foo.txt");
+    #[rstest]
+    #[case::mp4("a.mp4", true)]
+    #[case::MP4("a.MP4", true)]
+    #[case::mov("a.mov", true)]
+    #[case::MOV("a.MOV", true)]
+    #[case::txt("a.txt", false)]
+    #[case::m4a("a.m4a", false)]
+    #[case::png("a.png", false)]
+    #[case::gif("a.gif", false)]
+    #[case::DS_Store(".DS_Store", false)]
+    #[allow(non_snake_case)]
+    fn test_is_video(#[case] filename: &str, #[case] expected: bool) {
+        let sut = Path::new(filename);
 
         let result = is_video(sut);
 
-        assert!(!result);
+        assert_eq!(result, expected);
     }
 }
