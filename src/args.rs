@@ -1,6 +1,6 @@
 use clap::Parser;
 
-/// compress videos in a directory
+/// compress videos in a directory.
 #[derive(Parser)]
 pub struct Args {
     /// path of the directory that contains uncompressed videos
