@@ -31,16 +31,8 @@ Options:
 
 ## Installation
 
-1. 自作コマンド用のディレクトリを作成 (ここでは `~/command` とする)
-   ```sh
-   mkdir ~/command
-   ```
-1. パスを通すためのコマンドを`.zshrc`などの設定ファイルに追加
-   ```sh
-   # in .zshrc
-   export PATH="$HOME/command:$PATH"
-   ```
-1. プロジェクトをビルドし、作成したバイナリを`~/command`配下に置く。
-   ```sh
-   cargo build -r && mv ./target/release/comv ~/command
-   ```
+```sh
+git clone https://github.com/rendob/comv.git
+cd comv
+cargo install --path . # install comv to ~/.cargo/bin/
+```
