@@ -31,8 +31,16 @@ Options:
 
 ## Installation
 
+- Install `comv` to `~/.cargo/bin/`
+
 ```sh
-git clone https://github.com/rendob/comv.git
+git clone https://github.com/rendob/comv
 cd comv
-cargo install --path . # install comv to ~/.cargo/bin/
+cargo install --path .
+```
+
+or
+
+```sh
+cargo install --git https://github.com/rendob/comv
 ```
